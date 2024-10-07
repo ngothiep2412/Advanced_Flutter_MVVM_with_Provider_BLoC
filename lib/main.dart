@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mvvm_statemanagements/constants/my_theme_app.dart';
-import 'package:mvvm_statemanagements/screens/movies_screen.dart';
+import 'package:mvvm_statemanagements/screens/splash_screen.dart';
 import 'package:mvvm_statemanagements/services/init_getIt.dart';
 import 'package:mvvm_statemanagements/services/navigation_service.dart';
 
@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: MyThemeApp.lightTheme,
-      home: const MoviesScreen(),
+      home: const SplashScreen(),
     );
   }
 }

@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:mvvm_statemanagements/constants/my_app_icons.dart';
+import 'package:mvvm_statemanagements/models/movies_model.dart';
 import 'package:mvvm_statemanagements/widgets/movies/movies_widget.dart';
 
 class FavoritesScreen extends StatelessWidget {
-  const FavoritesScreen({super.key});
+  const FavoritesScreen({
+    super.key,
+    required this.movieModel,
+  });
+
+  final MovieModel movieModel;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +27,9 @@ class FavoritesScreen extends StatelessWidget {
       body: ListView.builder(
         itemCount: 10,
         itemBuilder: (context, index) {
-          return const MoviesWidget();
+          return MoviesWidget(
+            movieModel: movieModel,
+          );
         },
       ),
     );
