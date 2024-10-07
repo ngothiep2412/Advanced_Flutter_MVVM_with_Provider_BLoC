@@ -46,6 +46,8 @@ class _SplashScreenState extends State<SplashScreen> {
       body: _isLoading
           ? const Center(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text('Loading....'),
                   SizedBox(

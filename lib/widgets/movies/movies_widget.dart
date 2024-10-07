@@ -68,11 +68,14 @@ class MoviesWidget extends StatelessWidget {
                               size: 20,
                             ),
                             const SizedBox(width: 5),
-                            Text('${movieModel.voteAverage}/10'),
+                            Text(
+                                '${movieModel.voteAverage.toStringAsFixed(1)}/10'),
                           ],
                         ),
                         const SizedBox(height: 10),
-                        const GenresListWidget(),
+                        GenresListWidget(
+                          movieModel: movieModel,
+                        ),
                         Row(
                           mainAxisSize: MainAxisSize.max,
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -88,7 +91,9 @@ class MoviesWidget extends StatelessWidget {
                               style: const TextStyle(color: Colors.grey),
                             ),
                             const Spacer(),
-                            const FavoriteBtnWidget(),
+                            FavoriteBtnWidget(
+                              movieModel: movieModel,
+                            ),
                           ],
                         ),
                       ],
