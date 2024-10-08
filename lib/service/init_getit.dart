@@ -1,5 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:mvvm_statemanagements/service/navigation_service.dart';
+import 'package:mvvm_statemanagements/view_models/theme/theme_bloc.dart';
 
 import '../repository/movies_repo.dart';
 import 'api_service.dart';
@@ -11,4 +12,6 @@ void setupLocator() {
   getIt.registerLazySingleton<ApiService>(() => ApiService());
   getIt.registerLazySingleton<MoviesRepository>(
       () => MoviesRepository(getIt<ApiService>()));
+
+  getIt.registerLazySingleton<ThemeBloc>(() => ThemeBloc());
 }

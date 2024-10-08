@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:mvvm_statemanagements/constants/my_theme_data.dart';
+import 'package:mvvm_statemanagements/screens/movies_screen.dart';
 import 'package:mvvm_statemanagements/screens/splash_screen.dart';
-import 'package:mvvm_statemanagements/view_models/favorites_provider.dart';
-import 'package:mvvm_statemanagements/view_models/movies_provider.dart';
-import 'package:mvvm_statemanagements/view_models/theme_provider.dart';
-import 'package:provider/provider.dart';
-import 'screens/movies_screen.dart';
+import 'package:mvvm_statemanagements/view_models/theme/theme_bloc.dart';
 import 'service/init_getit.dart';
 import 'service/navigation_service.dart';
 
@@ -29,29 +28,24 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    // final themeProvider = Provider.of<ThemeProvider>(context);
-
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider<ThemeProvider>(
-            create: (_) => ThemeProvider() //..loadTheme(),
-            ),
-        ChangeNotifierProvider<MoviesProvider>(
-          create: (_) => MoviesProvider(),
-        ),
-        ChangeNotifierProvider(
-          create: (_) => FavoritesProvider(),
-        )
-      ],
-      child: Consumer(builder: (context, ThemeProvider themeProvider, child) {
-        return MaterialApp(
-          navigatorKey: getIt<NavigationService>().navigatorKey,
-          debugShowCheckedModeBanner: false,
-          title: 'Movies App',
-          theme: themeProvider.themeData,
-          home: const SplashScreen(),
-        );
-      }),
-    );
+    return MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => getIt<ThemeBloc>()..add(LoadThemeEvent()),
+          )
+        ],
+        child: BlocBuilder<ThemeBloc, ThemeState>(
+          builder: (context, state) {
+            return MaterialApp(
+              navigatorKey: getIt<NavigationService>().navigatorKey,
+              debugShowCheckedModeBanner: false,
+              title: 'Movies App',
+              theme: state is LightThemeState
+                  ? MyThemeData.lightTheme
+                  : MyThemeData.darkTheme,
+              home: const MoviesScreen(),
+            );
+          },
+        ));
   }
 }
