@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:mvvm_statemanagements/constants/my_theme_app.dart';
 import 'package:mvvm_statemanagements/screens/splash_screen.dart';
-import 'package:mvvm_statemanagements/services/init_getIt.dart';
-import 'package:mvvm_statemanagements/services/navigation_service.dart';
+import 'package:mvvm_statemanagements/view_models/favorites_provider.dart';
+import 'package:mvvm_statemanagements/view_models/movies_provider.dart';
+import 'package:mvvm_statemanagements/view_models/theme_provider.dart';
+import 'package:provider/provider.dart';
+import 'screens/movies_screen.dart';
+import 'service/init_getit.dart';
+import 'service/navigation_service.dart';
 
-Future<void> main() async {
-  setupLocator();
+void main() {
+  setupLocator(); // Initialize GetIt
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
+    // DeviceOrientation.landscapeLeft,
+    // DeviceOrientation.landscapeRight,
   ]).then((_) async {
-    await dotenv.load(fileName: 'assets/.env');
+    await dotenv.load(fileName: "assets/.env");
     runApp(const MyApp());
   });
 }
@@ -23,14 +29,29 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    // final navigatorKey = NavigationService().navigationKey; -- mỗi lần tạo sẽ tạo
+    // final themeProvider = Provider.of<ThemeProvider>(context);
 
-    return MaterialApp(
-      navigatorKey: getIt<NavigationService>().navigationKey,
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: MyThemeApp.lightTheme,
-      home: const SplashScreen(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<ThemeProvider>(
+            create: (_) => ThemeProvider() //..loadTheme(),
+            ),
+        ChangeNotifierProvider<MoviesProvider>(
+          create: (_) => MoviesProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => FavoritesProvider(),
+        )
+      ],
+      child: Consumer(builder: (context, ThemeProvider themeProvider, child) {
+        return MaterialApp(
+          navigatorKey: getIt<NavigationService>().navigatorKey,
+          debugShowCheckedModeBanner: false,
+          title: 'Movies App',
+          theme: themeProvider.themeData,
+          home: const SplashScreen(),
+        );
+      }),
     );
   }
 }

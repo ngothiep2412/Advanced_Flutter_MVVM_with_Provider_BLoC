@@ -1,37 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:mvvm_statemanagements/constants/my_app_icons.dart';
-import 'package:mvvm_statemanagements/models/movies_model.dart';
-import 'package:mvvm_statemanagements/screens/movies_detail_screen.dart';
-import 'package:mvvm_statemanagements/services/init_getIt.dart';
-import 'package:mvvm_statemanagements/services/navigation_service.dart';
-import 'package:mvvm_statemanagements/widgets/cached_image.dart';
-import 'package:mvvm_statemanagements/widgets/movies/favorite_btn.dart';
-import 'package:mvvm_statemanagements/widgets/movies/genres_widget.dart';
+import 'package:mvvm_statemanagements/screens/movie_details.dart';
+import 'package:provider/provider.dart';
+import '../../models/movies_model.dart';
+import '../../service/init_getit.dart';
+import '../../service/navigation_service.dart';
+import '../cached_image.dart';
+import 'favorite_btn.dart';
+import 'genres_list_widget.dart';
 
 class MoviesWidget extends StatelessWidget {
   const MoviesWidget({
     super.key,
-    required this.movieModel,
+    // required this.movieModel
   });
 
-  final MovieModel movieModel;
-
+  // final MovieModel movieModel;
   @override
   Widget build(BuildContext context) {
+    final movieModelProvider = Provider.of<MovieModel>(context);
+
     return Padding(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(8.0),
       child: Material(
-        borderRadius: BorderRadius.circular(12.0),
         color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(12.0),
         child: InkWell(
+          borderRadius: BorderRadius.circular(12.0),
           onTap: () {
             getIt<NavigationService>().navigate(
-              MoviesDetailScreen(
-                movieModel: movieModel,
+              ChangeNotifierProvider.value(
+                value: movieModelProvider,
+                child: const MovieDetailsScreen(),
               ),
             );
           },
-          borderRadius: BorderRadius.circular(12.0),
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: IntrinsicWidth(
@@ -40,12 +43,12 @@ class MoviesWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Hero(
-                    tag: movieModel.id,
+                    tag: movieModelProvider.id,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12.0),
-                      child: CachedImagedWidget(
+                      child: CachedImageWidget(
                         imgUrl:
-                            'https://image.tmdb.org/t/p/w500/${movieModel.backdropPath}',
+                            "https://image.tmdb.org/t/p/w500/${movieModelProvider.backdropPath}",
                       ),
                     ),
                   ),
@@ -55,7 +58,7 @@ class MoviesWidget extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          movieModel.originalTitle,
+                          movieModelProvider.originalTitle,
                           style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
@@ -69,12 +72,14 @@ class MoviesWidget extends StatelessWidget {
                             ),
                             const SizedBox(width: 5),
                             Text(
-                                '${movieModel.voteAverage.toStringAsFixed(1)}/10'),
+                                '${movieModelProvider.voteAverage.toStringAsFixed(1)}/10')
+                            //"${movieModel.voteAverage.toStringAsFixed(1)}/10"),
                           ],
                         ),
                         const SizedBox(height: 10),
-                        GenresListWidget(
-                          movieModel: movieModel,
+                        ChangeNotifierProvider.value(
+                          value: movieModelProvider,
+                          child: const GenresListWidget(),
                         ),
                         Row(
                           mainAxisSize: MainAxisSize.max,
@@ -87,13 +92,13 @@ class MoviesWidget extends StatelessWidget {
                             ),
                             const SizedBox(width: 5),
                             Text(
-                              movieModel.releaseDate,
+                              movieModelProvider.releaseDate,
                               style: const TextStyle(color: Colors.grey),
                             ),
                             const Spacer(),
                             FavoriteBtnWidget(
-                              movieModel: movieModel,
-                            ),
+                              movieModel: movieModelProvider,
+                            )
                           ],
                         ),
                       ],

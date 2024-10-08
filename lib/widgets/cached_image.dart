@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:mvvm_statemanagements/constants/my_app_icons.dart';
 
-class CachedImagedWidget extends StatelessWidget {
-  const CachedImagedWidget({
-    super.key,
-    required this.imgUrl,
-    this.imgHeight,
-    this.imgWidth,
-    this.boxFit,
-  });
-
+class CachedImageWidget extends StatelessWidget {
+  const CachedImageWidget(
+      {super.key,
+      required this.imgUrl,
+      this.imgHeight,
+      this.imgWidth,
+      this.boxFit});
   final String imgUrl;
   final double? imgHeight;
   final double? imgWidth;
@@ -21,10 +20,10 @@ class CachedImagedWidget extends StatelessWidget {
     return CachedNetworkImage(
       height: imgHeight ?? size.width * 0.3,
       width: imgWidth ?? size.width * 0.2,
-      imageUrl: imgUrl,
+      imageUrl: imgUrl, //?? ,
       fit: boxFit ?? BoxFit.cover,
       errorWidget: (context, url, error) => const Icon(
-        Icons.error,
+        MyAppIcons.error,
         color: Colors.red,
       ),
     );

@@ -1,63 +1,69 @@
 import 'package:flutter/material.dart';
-import 'package:mvvm_statemanagements/repository/movies_repository.dart';
 import 'package:mvvm_statemanagements/screens/movies_screen.dart';
-import 'package:mvvm_statemanagements/services/init_getIt.dart';
-import 'package:mvvm_statemanagements/services/navigation_service.dart';
-import 'package:mvvm_statemanagements/widgets/my_error_widget.dart';
+import 'package:mvvm_statemanagements/service/init_getit.dart';
+import 'package:mvvm_statemanagements/service/navigation_service.dart';
+import 'package:mvvm_statemanagements/view_models/favorites_provider.dart';
+import 'package:mvvm_statemanagements/view_models/movies_provider.dart';
+import 'package:provider/provider.dart';
 
-class SplashScreen extends StatefulWidget {
+import '../widgets/my_error_widget.dart';
+
+class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
-  @override
-  State<SplashScreen> createState() => _SplashScreenState();
-}
+  Future<void> _loadInitialData(BuildContext context) async {
+    Future.microtask(() async {
+      if (!context.mounted) return;
+      await Provider.of<MoviesProvider>(context, listen: false).getMovies();
 
-class _SplashScreenState extends State<SplashScreen> {
-  bool _isLoading = false;
-  String _errorMessage = '';
-  final _moviesRepository = getIt<MoviesRepository>();
-
-  Future<void> _loadData() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
+      if (!context.mounted) return;
+      await Provider.of<FavoritesProvider>(context, listen: false)
+          .loadFavorites();
     });
-
-    try {
-      await _moviesRepository.fetchGenres();
-      await getIt<NavigationService>().navigateReplace(const MoviesScreen());
-    } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-        _isLoading = false;
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _loadData();
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //   await Provider.of<MoviesProvider>(context, listen: false).getMovies();
+    // });
   }
 
   @override
   Widget build(BuildContext context) {
+    final moviesProvider = Provider.of<MoviesProvider>(context, listen: false);
     return Scaffold(
-      body: _isLoading
-          ? const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text('Loading....'),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  CircularProgressIndicator.adaptive(),
-                ],
-              ),
-            )
-          : MyErrorWidget(errorText: _errorMessage, retryFunction: _loadData),
-    );
+        body: FutureBuilder(
+      future: _loadInitialData(context),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator.adaptive();
+        } else if (snapshot.hasError) {
+          if (moviesProvider.genresList.isNotEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) {
+                getIt<NavigationService>()
+                    .navigateReplace(const MoviesScreen());
+              },
+            );
+          }
+
+          return Provider.of<MoviesProvider>(context).isLoading
+              ? const Center(
+                  child: CircularProgressIndicator.adaptive(),
+                )
+              : MyErrorWidget(
+                  errorText: '_errorMessage',
+                  retryFunction: () {
+                    _loadInitialData(context);
+                  },
+                );
+        } else {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            getIt<NavigationService>().navigateReplace(const MoviesScreen());
+          });
+
+          return const SizedBox.shrink();
+        }
+      },
+    )
+        // : MyErrorWidget(errorText: '_errorMessage', retryFunction: () {}),
+        );
   }
 }
