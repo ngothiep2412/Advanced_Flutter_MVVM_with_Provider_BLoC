@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mvvm_statemanagements/constants/my_app_icons.dart';
 import 'package:mvvm_statemanagements/screens/movie_details.dart';
-import 'package:provider/provider.dart';
 import '../../models/movies_model.dart';
 import '../../service/init_getit.dart';
 import '../../service/navigation_service.dart';
@@ -10,16 +9,11 @@ import 'favorite_btn.dart';
 import 'genres_list_widget.dart';
 
 class MoviesWidget extends StatelessWidget {
-  const MoviesWidget({
-    super.key,
-    // required this.movieModel
-  });
+  const MoviesWidget({super.key, required this.movieModel});
 
-  // final MovieModel movieModel;
+  final MovieModel movieModel;
   @override
   Widget build(BuildContext context) {
-    final movieModelProvider = Provider.of<MovieModel>(context);
-
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Material(
@@ -28,12 +22,9 @@ class MoviesWidget extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(12.0),
           onTap: () {
-            getIt<NavigationService>().navigate(
-              ChangeNotifierProvider.value(
-                value: movieModelProvider,
-                child: const MovieDetailsScreen(),
-              ),
-            );
+            getIt<NavigationService>().navigate(MovieDetailsScreen(
+              movieModel: movieModel,
+            ));
           },
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -43,12 +34,12 @@ class MoviesWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Hero(
-                    tag: movieModelProvider.id,
+                    tag: movieModel.id,
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(12.0),
                       child: CachedImageWidget(
                         imgUrl:
-                            "https://image.tmdb.org/t/p/w500/${movieModelProvider.backdropPath}",
+                            "https://image.tmdb.org/t/p/w500/${movieModel.backdropPath}",
                       ),
                     ),
                   ),
@@ -58,7 +49,7 @@ class MoviesWidget extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          movieModelProvider.originalTitle,
+                          movieModel.originalTitle,
                           style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
@@ -72,14 +63,13 @@ class MoviesWidget extends StatelessWidget {
                             ),
                             const SizedBox(width: 5),
                             Text(
-                                '${movieModelProvider.voteAverage.toStringAsFixed(1)}/10')
+                                '${movieModel.voteAverage.toStringAsFixed(1)}/10'),
                             //"${movieModel.voteAverage.toStringAsFixed(1)}/10"),
                           ],
                         ),
                         const SizedBox(height: 10),
-                        ChangeNotifierProvider.value(
-                          value: movieModelProvider,
-                          child: const GenresListWidget(),
+                        GenresListWidget(
+                          movieModel: movieModel,
                         ),
                         Row(
                           mainAxisSize: MainAxisSize.max,
@@ -92,12 +82,12 @@ class MoviesWidget extends StatelessWidget {
                             ),
                             const SizedBox(width: 5),
                             Text(
-                              movieModelProvider.releaseDate,
+                              movieModel.releaseDate,
                               style: const TextStyle(color: Colors.grey),
                             ),
                             const Spacer(),
                             FavoriteBtnWidget(
-                              movieModel: movieModelProvider,
+                              movieModel: movieModel,
                             )
                           ],
                         ),

@@ -1,23 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:mvvm_statemanagements/models/movies_model.dart';
+import 'package:mvvm_statemanagements/constants/my_app_constants.dart';
 import 'package:mvvm_statemanagements/widgets/movies/favorite_btn.dart';
-import 'package:provider/provider.dart';
 
+import '../models/movies_model.dart';
 import '../widgets/cached_image.dart';
 import '../widgets/movies/genres_list_widget.dart';
 
 class MovieDetailsScreen extends StatelessWidget {
-  const MovieDetailsScreen({
-    super.key,
-    // required this.movieModel
-  });
+  const MovieDetailsScreen({super.key, required this.movieModel});
 
-  // final MovieModel movieModel;
+  final MovieModel movieModel;
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
-    final movieModelProvider = Provider.of<MovieModel>(context);
-
     return Scaffold(
       body: SafeArea(
         child: Stack(
@@ -26,10 +21,10 @@ class MovieDetailsScreen extends StatelessWidget {
               height: size.height * 0.45,
               width: double.infinity,
               child: Hero(
-                tag: movieModelProvider.id,
+                tag: movieModel.id,
                 child: CachedImageWidget(
                   imgUrl:
-                      "https://image.tmdb.org/t/p/w500/${movieModelProvider.backdropPath}",
+                      "https://image.tmdb.org/t/p/w500/${movieModel.backdropPath}",
                 ),
               ),
             ),
@@ -54,7 +49,7 @@ class MovieDetailsScreen extends StatelessWidget {
                               children: [
                                 const SizedBox(height: 25),
                                 Text(
-                                  movieModelProvider.title,
+                                  movieModel.title,
                                   maxLines: 2,
                                   style: const TextStyle(
                                     // color: Theme.of(context).textSelectionColor,
@@ -75,21 +70,22 @@ class MovieDetailsScreen extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 5),
                                     Text(
-                                        '${movieModelProvider.voteAverage.toStringAsFixed(1)}/10'),
-                                    //"${movieModel.voteAverage.toStringAsFixed(1)}/10"),
+                                        "${movieModel.voteAverage.toStringAsFixed(1)}/10"),
                                     const Spacer(),
                                     Text(
-                                      movieModelProvider.releaseDate,
+                                      movieModel.releaseDate,
                                       style:
                                           const TextStyle(color: Colors.grey),
                                     ),
                                   ],
                                 ),
                                 const SizedBox(height: 10),
-                                GenresListWidget(),
+                                GenresListWidget(
+                                  movieModel: movieModel,
+                                ),
                                 const SizedBox(height: 15),
                                 Text(
-                                  movieModelProvider.overview,
+                                  movieModel.overview,
                                   textAlign: TextAlign.justify,
                                   style: const TextStyle(
                                     fontSize: 18.0,
@@ -108,10 +104,11 @@ class MovieDetailsScreen extends StatelessWidget {
                             shape: BoxShape.circle,
                           ),
                           child: Padding(
-                              padding: const EdgeInsets.all(6.0),
-                              child: FavoriteBtnWidget(
-                                movieModel: movieModelProvider,
-                              )),
+                            padding: const EdgeInsets.all(6.0),
+                            child: FavoriteBtnWidget(
+                              movieModel: movieModel,
+                            ),
+                          ),
                         ),
                       ),
                     ],

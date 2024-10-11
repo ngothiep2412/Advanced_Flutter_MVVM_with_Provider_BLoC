@@ -1,29 +1,17 @@
-import 'package:flutter/material.dart';
 import 'package:mvvm_statemanagements/models/movies_genre.dart';
-import 'package:mvvm_statemanagements/view_models/movies_provider.dart';
-import 'package:provider/provider.dart';
-
-import '../repository/movies_repo.dart';
-import '../service/init_getit.dart';
 
 class GenreUtils {
   static List<MoviesGenre> movieGenresNames(
-      List<int> genreIds, BuildContext context) {
-    final moviesProvider = Provider.of<MoviesProvider>(context, listen: false);
-
-    final moviesRepository = getIt<MoviesRepository>();
-
-    final cachedGenres = moviesProvider.genresList;
-
+      List<int> genreIds, List<MoviesGenre> allGenresList) {
     List<MoviesGenre> genresNames = [];
+
     for (var genreId in genreIds) {
-      var genre = cachedGenres.firstWhere(
+      var genre = allGenresList.firstWhere(
         (g) => g.id == genreId,
         orElse: () => MoviesGenre(id: 5448484, name: 'Unknown'),
       );
       genresNames.add(genre);
     }
-
     return genresNames;
   }
 }

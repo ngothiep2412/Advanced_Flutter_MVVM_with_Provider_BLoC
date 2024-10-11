@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mvvm_statemanagements/view_models/favorites_provider.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:mvvm_statemanagements/service/init_getit.dart';
+import 'package:mvvm_statemanagements/view_models/favorites/favorites_bloc.dart';
+import 'package:mvvm_statemanagements/widgets/my_error_widget.dart';
+
 import '../constants/my_app_icons.dart';
 import '../widgets/movies/movies_widget.dart';
 
@@ -9,15 +12,13 @@ class FavoritesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final favoriteProvider = Provider.of<FavoritesProvider>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Favorite Movies"),
         actions: [
           IconButton(
             onPressed: () {
-              favoriteProvider.clearAllFavorite();
+              getIt<FavoritesBloc>().add(RemoveAllFromFavorites());
             },
             icon: const Icon(
               MyAppIcons.delete,
@@ -26,20 +27,31 @@ class FavoritesScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: favoriteProvider.favoritesList.isEmpty
-          ? const Center(
-              child: Text('No added Favorites'),
-            )
-          : ListView.builder(
-              itemCount: favoriteProvider.favoritesList.length,
-              itemBuilder: (context, index) {
-                return ChangeNotifierProvider.value(
-                  value:
-                      favoriteProvider.favoritesList.reversed.toList()[index],
-                  child: const MoviesWidget(),
-                );
-              },
-            ),
+      body:
+          BlocBuilder<FavoritesBloc, FavoritesState>(builder: (context, state) {
+        if (state is FavoritesLoading) {
+          return const Center(
+            child: CircularProgressIndicator.adaptive(),
+          );
+        } else if (state is FavoritesError) {
+          return MyErrorWidget(
+            errorText: state.message,
+            retryFunction: () {
+              getIt<FavoritesBloc>().add(LoadFavorite());
+            },
+          );
+        } else if (state is FavoritesLoaded && (state).favorites.isNotEmpty) {
+          return ListView.builder(
+            itemCount: state.favorites.length,
+            itemBuilder: (context, index) {
+              return MoviesWidget(movieModel: state.favorites[index]);
+            },
+          );
+        }
+        return const Center(
+          child: Text('No data available'),
+        );
+      }),
     );
   }
 }
