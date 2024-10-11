@@ -3,8 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:mvvm_statemanagements/constants/my_theme_data.dart';
-import 'package:mvvm_statemanagements/screens/movies_screen.dart';
 import 'package:mvvm_statemanagements/screens/splash_screen.dart';
+import 'package:mvvm_statemanagements/view_models/favorites/favorites_bloc.dart';
+import 'package:mvvm_statemanagements/view_models/movies/movies_bloc_bloc.dart';
 import 'package:mvvm_statemanagements/view_models/theme/theme_bloc.dart';
 import 'service/init_getit.dart';
 import 'service/navigation_service.dart';
@@ -29,23 +30,30 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (_) => getIt<ThemeBloc>()..add(LoadThemeEvent()),
-          )
-        ],
-        child: BlocBuilder<ThemeBloc, ThemeState>(
-          builder: (context, state) {
-            return MaterialApp(
-              navigatorKey: getIt<NavigationService>().navigatorKey,
-              debugShowCheckedModeBanner: false,
-              title: 'Movies App',
-              theme: state is LightThemeState
-                  ? MyThemeData.lightTheme
-                  : MyThemeData.darkTheme,
-              home: const MoviesScreen(),
-            );
-          },
-        ));
+      providers: [
+        BlocProvider(
+          create: (_) => getIt<ThemeBloc>()..add(LoadThemeEvent()),
+        ),
+        BlocProvider(
+          create: (_) => getIt<MoviesBlocBloc>(),
+        ),
+        BlocProvider(
+          create: (_) => getIt<FavoritesBloc>(),
+        )
+      ],
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, state) {
+          return MaterialApp(
+            navigatorKey: getIt<NavigationService>().navigatorKey,
+            debugShowCheckedModeBanner: false,
+            title: 'Movies App',
+            theme: state is LightThemeState
+                ? MyThemeData.lightTheme
+                : MyThemeData.darkTheme,
+            home: const SplashScreen(),
+          );
+        },
+      ),
+    );
   }
 }

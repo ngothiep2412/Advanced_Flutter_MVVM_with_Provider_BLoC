@@ -28,7 +28,7 @@ class NavigationService {
 
   void showSnackbar(String message) {
     final context = navigatorKey.currentContext!;
-    ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+    // ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
     final snackbarWidget = SnackBar(
         content: Text(
       message,
